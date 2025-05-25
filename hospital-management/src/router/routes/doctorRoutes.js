@@ -5,6 +5,7 @@ import PatientMedicalInfo from '../../pages/shared/patient-info/PatientMedicalIn
 import PatientHistory from '../../pages/shared/patient-info/PatientHistory'
 import PatientPrescription from '../../pages/shared/patient-info/PatientPrescription';
 import PatientExamination from '../../pages/shared/patient-info/PatientExamination';
+import AddPatientExamination from '../../pages/shared/AddPatientExamination';
 
 const doctorRoutes = [
   {
@@ -35,6 +36,11 @@ const doctorRoutes = [
   {
     path: '/patient/prescription/:id',
     element: <PatientPrescription/>,
+    role: "doctor",
+  },
+  {
+    path: '/patient/examination/add',
+    element: <AddPatientExamination/>,
     role: "doctor",
   },
 ]

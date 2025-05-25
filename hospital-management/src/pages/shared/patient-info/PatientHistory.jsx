@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { MdAddToQueue } from "react-icons/md";
 import Sidebar from './Sidebar';
 
 const InputField = ({ label, value, type }) => {
@@ -10,7 +11,7 @@ const InputField = ({ label, value, type }) => {
   )
 }
 
-const Examination = ({}) => {
+const Examination = ({ }) => {
   return (
     <div className='pl-10 pr-4 py-6 border-[2px] border-gray-light rounded-lg'>
       <div className='flex flex-row text-lg items-center justify-between font-bold text-gray-medium'>
@@ -60,17 +61,24 @@ const PatientHistory = (userRole) => {
       <h1 className='mt-2 font-semibold text-[1.6rem] text-gray-dark'>Tài khoản</h1>
       {/* Divider */}
       <span className='w-full h-[2px] bg-gray-200'></span>
-      {/* Info */}
+      {/* Main Content */}
       <div className='mt-2 gap-4 flex flex-row'>
         {/* Sidebar */}
         <Sidebar pathname='patient-history' id={1} />
-        {/* Content */}
-        <div className='flex flex-col overflow-y-auto max-h-[550px] w-full gap-4 '>
-          {/* Patient Checkup History */}
-          <Examination/>
-          <Examination/>
-          <Examination/>
-          <Examination/>
+        {/* Patient Checkup History */}
+        <div className='flex flex-col overflow-y-auto max-h-[550px] w-full gap-2'>
+          <a href='/patient/examination/add' 
+          className='self-end flex gap-2 bg-indigo-500 items-center text-white
+          px-5 py-[6px] rounded-[4px] hover:bg-indigo-600 transition-all'>
+            <MdAddToQueue/>
+            <span>Thêm</span> 
+          </a>
+          <div className='flex flex-col gap-4 '>
+            <Examination />
+            <Examination />
+            <Examination />
+            <Examination />
+          </div>
         </div>
       </div>
     </div>
