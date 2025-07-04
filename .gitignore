@@ -1,0 +1,78 @@
+# === COMMON ===
+# IDE
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Swap / backup / temp
+*.swp
+*.swo
+*.bak
+*.tmp
+*.cache
+*.log
+
+# Env
+.env
+.env.*
+*.key
+
+# === PHP / Laravel ===
+vendor/
+node_modules/
+public/storage
+storage/*.key
+storage/logs/
+storage/framework/
+.phpunit.result.cache
+Homestead.yaml
+Homestead.json
+npm-debug.log
+yarn-error.log
+
+# === Python / Flask ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+instance/
+*.sqlite3
+*.db
+venv/
+env/
+ENV/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# === Java / Spring Boot ===
+/target/
+/bin/
+/build/
+.gradle/
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+*.class
+*.jar
+*.war
+*.ear
+
+# === Additional for any language ===
+logs/
+coverage/
