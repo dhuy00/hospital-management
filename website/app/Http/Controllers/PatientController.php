@@ -2,72 +2,100 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PatientController extends Controller
 {
     public function index()
     {
-        $patients = [
-            ['id' => 1, 'name' => 'Nguyễn Văn A', 'age' => 30, 'gender' => 'Nam'],
-            ['id' => 2, 'name' => 'Trần Thị B', 'age' => 25, 'gender' => 'Nữ'],
-            ['id' => 3, 'name' => 'Lê Văn C', 'age' => 40, 'gender' => 'Nam'],
-        ];
+        $patients = Http::get('http://localhost:8001/api/patients')->json();
 
         return view('patients.index', compact('patients'));
     }
 
+
     public function show($id)
     {
-        $patient = [
-            'id' => $id,
-            'name' => 'Nguyễn Văn A',
-            'age' => 30,
-            'gender' => 'Nam',
-        ];
+        try {
+            $response = Http::get("http://localhost:8001/api/patients/{$id}");
 
-        $medicalRecords = [
-            [
-                'date' => '2025-06-01',
-                'doctor' => 'BS. Trần Văn B',
-                'diagnosis' => 'Viêm họng cấp',
-                'services' => ['Khám nội tổng quát', 'Xét nghiệm máu']
-            ],
-            [
-                'date' => '2025-05-15',
-                'doctor' => 'BS. Nguyễn Thị C',
-                'diagnosis' => 'Đau dạ dày',
-                'services' => ['Khám tiêu hóa', 'Nội soi dạ dày']
-            ],
-            [
-                'date' => '2025-04-02',
-                'doctor' => 'BS. Lê Văn D',
-                'diagnosis' => 'Kiểm tra định kỳ',
-                'services' => ['Khám tổng quát']
-            ],
-        ];
+            if ($response->successful()) {
+                $data = $response->json();
 
-        return view('patients.show', compact('patient', 'medicalRecords'));
+                $patient = $data['patient'] ?? [];
+                $medicalRecords = $data['medicalRecords'] ?? [];
+
+                return view('patients.show', compact('patient', 'medicalRecords'));
+            } else {
+                return abort(404, 'Patient not found');
+            }
+        } catch (\Exception $e) {
+            return abort(500, 'Error connecting to patient service: ' . $e->getMessage());
+        }
+    }
+
+    public function edit($id)
+    {
+        $patient = Http::get("http://localhost:8081/api/patients/{$id}")->json();
+        return view('patients.edit', compact('patient'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        Log::info('Update called with data:', $request->all());
+
+        $request->validate([
+            'fullName' => 'required|string|max:255',
+            'email' => 'required|email',
+            'dateOfBirth' => 'required|date',
+            'phone' => 'required|string|max:20',
+            'gender' => 'required|string',
+            'address' => 'required|string',
+        ]);
+
+        $response = Http::asJson()->put("http://localhost:8001/api/patients/{$id}", [
+            'fullName' => $request->fullName,
+            'email' => $request->email,
+            'dateOfBirth' => $request->dateOfBirth,
+            'phone' => $request->phone,
+            'gender' => $request->gender,
+            'address' => $request->address,
+        ]);
+
+        Log::info('API Response', [
+            'status' => $response->status(),
+        ]);
+
+
+        return redirect()->route('patients.show', $id)->with('success', 'Cập nhật thành công');
     }
 
     public function prescriptionDetail($patientId, $recordId)
     {
-        // Mock chi tiết đơn thuốc theo recordId
-        $prescriptions = [
-            1 => [
-                ['medicine' => 'Paracetamol', 'dosage' => '500mg', 'quantity' => 10],
-                ['medicine' => 'Amoxicillin', 'dosage' => '250mg', 'quantity' => 15],
-            ],
-            2 => [
-                ['medicine' => 'Omeprazole', 'dosage' => '20mg', 'quantity' => 7],
-            ],
-            3 => [
-                ['medicine' => 'Vitamin C', 'dosage' => '500mg', 'quantity' => 30],
-            ],
-        ];
+        try {
+            $response = Http::get("http://localhost:8001/api/prescriptions/patient/{$patientId}");
 
-        $prescription = $prescriptions[$recordId] ?? [];
+            if ($response->failed()) {
+                return back()->withErrors('Không thể lấy dữ liệu đơn thuốc từ API.');
+            }
 
-        return view('patients.prescription', compact('patientId', 'recordId', 'prescription'));
+            $allPrescriptions = $response->json();
+
+            $prescriptionData = collect($allPrescriptions)->firstWhere('prescription_id', (int)$recordId);
+
+            if (!$prescriptionData) {
+                return back()->withErrors('Không tìm thấy đơn thuốc.');
+            }
+
+            return view('patients.prescription', [
+                'patientId' => $patientId,
+                'recordId' => $recordId,
+                'prescription' => $prescriptionData['medicines'],
+            ]);
+        } catch (\Exception $e) {
+            return back()->withErrors('Lỗi: ' . $e->getMessage());
+        }
     }
 }

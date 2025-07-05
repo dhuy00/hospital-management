@@ -3,38 +3,48 @@
 @section('title', 'Chi tiết bệnh nhân')
 
 @section('content')
-<h1 class="text-2xl font-bold mb-4">Chi tiết bệnh nhân</h1>
-
-<div class="bg-white p-6 rounded shadow-md space-y-3">
-  <p><strong>ID:</strong> {{ $patient['id'] }}</p>
-  <p><strong>Tên:</strong> {{ $patient['name'] }}</p>
-  <p><strong>Tuổi:</strong> {{ $patient['age'] }}</p>
-  <p><strong>Giới tính:</strong> {{ $patient['gender'] }}</p>
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Chi tiết bệnh nhân</h1>
+    <a href="{{ route('patients.edit', $patient['id']) }}"
+        class="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+        <i data-lucide="edit" class="mr-2 w-4 h-4"></i> Chỉnh sửa
+    </a>
 </div>
 
-<h2 class="text-xl font-semibold mt-6 mb-3">Lịch sử khám bệnh</h2>
+<div class="bg-white p-6 rounded-lg shadow space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <p><strong>ID:</strong> {{ $patient['id'] }}</p>
+        <p><strong>Email:</strong> {{ $patient['email'] }}</p>
+        <p><strong>Tên:</strong> {{ $patient['fullName'] }}</p>
+        <p><strong>Ngày sinh:</strong> {{ $patient['dateOfBirth'] }}</p>
+        <p><strong>Số điện thoại:</strong> {{ $patient['phone'] }}</p>
+        <p><strong>Giới tính:</strong> {{ $patient['gender'] }}</p>
+        <p class="md:col-span-2"><strong>Địa chỉ:</strong> {{ $patient['address'] }}</p>
+    </div>
+</div>
+
+<h2 class="text-xl font-semibold mt-8 mb-4">Lịch sử khám bệnh</h2>
 
 <div class="space-y-4">
-  @foreach($medicalRecords as $record)
-  <div class="bg-gray-50 p-4 rounded shadow-sm flex justify-between items-center">
-    <div class="">
-    <p><strong>Ngày khám:</strong> {{ $record['date'] }}</p>
-    <p><strong>Bác sĩ:</strong> {{ $record['doctor'] }}</p>
-    <p><strong>Chẩn đoán:</strong> {{ $record['diagnosis'] }}</p>
-    <p><strong>Dịch vụ sử dụng:</strong></p>
-    <ul class="list-disc list-inside">
-      @foreach($record['services'] as $service)
-      <li>{{ $service }}</li>
-      @endforeach
-    </ul>
+    @forelse($medicalRecords as $record)
+    <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+            <p><strong>Ngày khám:</strong> {{ $record['appointmentTime'] }}</p>
+            <p><strong>Bác sĩ:</strong> {{ $record['doctorName'] }}</p>
+            <p><strong>Lý do:</strong> {{ $record['reason'] }}</p>
+            <p><strong>Khoa:</strong> {{ $record['doctorDepartment'] }}</p>
+            <p class="md:col-span-2"><strong>Dịch vụ sử dụng:</strong> {{ $record['serviceName'] }}</p>
+        </div>
+        <a href="{{ route('patients.prescription', ['patientId' => $patient['id'], 'recordId' => $loop->iteration]) }}"
+            class="inline-flex items-center bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
+            <i data-lucide="file-text" class="mr-2 w-4 h-4"></i> Xem đơn thuốc
+        </a>
     </div>
-    <a href="{{ route('patients.prescription', ['patientId' => $patient['id'], 'recordId' => $loop->iteration]) }}"
-      class="inline-block bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-      Xem đơn thuốc
-    </a>
-  </div>
-  @endforeach
+    @empty
+    <p class="text-gray-500 italic">Chưa có lịch sử khám bệnh</p>
+    @endforelse
 </div>
 
-<a href="{{ route('patients.index') }}" class="inline-block mt-4 text-blue-500 hover:underline">← Quay lại danh sách</a>
+<a href="{{ route('patients.index') }}"
+    class="inline-block mt-6 text-blue-500 hover:underline transition">← Quay lại danh sách</a>
 @endsection

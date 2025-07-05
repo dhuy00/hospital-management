@@ -121,6 +121,7 @@ public class AppointmentService {
         Optional<Doctor> doctor = doctorRepository.findById(a.getDoctorId());
         if (doctor.isPresent()) {
             res.setDoctorName(doctor.get().getFullName());
+            res.setDoctorDepartment(doctor.get().getDepartment());
         }
         
         if (a.getServiceId() != null) {

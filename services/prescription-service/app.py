@@ -5,9 +5,9 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 conn = psycopg2.connect(
-    dbname="hospital_db",
+    dbname="prescription_db",
     user="postgres",
-    password="postgres",
+    password="123",
     host="localhost",
     port="5432"
 )
@@ -108,6 +108,45 @@ def get_prescription_by_id(id):
     }
 
     return jsonify(result)
+
+@app.route("/api/prescriptions/patient/<int:patient_id>", methods=["GET"])
+def get_prescriptions_by_patient_id(patient_id):
+    cur = conn.cursor()
+
+    # Lấy tất cả đơn thuốc của bệnh nhân
+    cur.execute("""
+        SELECT p.id, p.patient_id, p.status, p.created_at,
+               d.medicine_name, d.dosage, d.instructions
+        FROM prescriptions p
+        LEFT JOIN prescription_details d ON p.id = d.prescription_id
+        WHERE p.patient_id = %s
+        ORDER BY p.id
+    """, (patient_id,))
+    rows = cur.fetchall()
+    cur.close()
+
+    if not rows:
+        return jsonify({"error": "No prescriptions found for this patient"}), 404
+
+    prescriptions = {}
+    for row in rows:
+        pid = row[0]
+        if pid not in prescriptions:
+            prescriptions[pid] = {
+                "prescription_id": pid,
+                "patient_id": row[1],
+                "status": row[2],
+                "created_at": row[3],
+                "medicines": []
+            }
+        if row[4]:
+            prescriptions[pid]["medicines"].append({
+                "medicine_name": row[4],
+                "dosage": row[5],
+                "instructions": row[6]
+            })
+
+    return jsonify(list(prescriptions.values()))
 
 
 @app.route("/api/prescriptions/<int:id>", methods=["PUT"])
