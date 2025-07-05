@@ -19,7 +19,6 @@ import com.example.appointment_service.repository.AppointmentRepository;
 import com.example.appointment_service.repository.DoctorRepository;
 import com.example.appointment_service.repository.ServiceRepository;
 
-
 @Service
 public class AppointmentService {
 
@@ -32,36 +31,49 @@ public class AppointmentService {
     @Autowired
     private ServiceRepository serviceRepository;
 
-	@Autowired
-	private RestTemplate restTemplate;
+    @Autowired
+    private RestTemplate restTemplate;
 
-	public boolean checkPatientExists(Long patientId) {
-		try {
-			ResponseEntity<Void> response = restTemplate.getForEntity(
-				"http://localhost:8081/api/patients/" + patientId, Void.class);
-			return response.getStatusCode().is2xxSuccessful();
-		} catch (HttpClientErrorException.NotFound e) {
-			return false;
-		}
-	}
+    public boolean checkPatientExists(Long patientId) {
+        try {
+            ResponseEntity<Void> response = restTemplate.getForEntity(
+                    "http://localhost:8081/api/patients/" + patientId, Void.class);
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (HttpClientErrorException.NotFound e) {
+            return false;
+        }
+    }
+
+    public List<AppointmentResponse> getAllAppointments() {
+        return appointmentRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public AppointmentResponse getAppointmentById(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        return toResponse(appointment);
+    }
 
     public AppointmentResponse book(AppointmentRequest request) {
         // Validate patient exists
         if (!checkPatientExists(request.getPatientId())) {
-        	throw new RuntimeException("Patient not found");
-    	}
-    	
-    	// Validate doctor exists
-    	if (!doctorRepository.existsById(request.getDoctorId())) {
-    	    throw new RuntimeException("Doctor not found");
-    	}
-    	
-    	// Validate service exists (if provided)
-    	if (request.getServiceId() != null && !serviceRepository.existsById(request.getServiceId())) {
-    	    throw new RuntimeException("Service not found");
-    	}
-		
-		Appointment a = new Appointment();
+            throw new RuntimeException("Patient not found");
+        }
+
+        // Validate doctor exists
+        if (!doctorRepository.existsById(request.getDoctorId())) {
+            throw new RuntimeException("Doctor not found");
+        }
+
+        // Validate service exists (if provided)
+        if (request.getServiceId() != null && !serviceRepository.existsById(request.getServiceId())) {
+            throw new RuntimeException("Service not found");
+        }
+
+        Appointment a = new Appointment();
         a.setPatientId(request.getPatientId());
         a.setDoctorId(request.getDoctorId());
         a.setAppointmentTime(request.getAppointmentTime());
@@ -116,21 +128,22 @@ public class AppointmentService {
         res.setReason(a.getReason());
         res.setCreatedAt(a.getCreatedAt());
         res.setUpdatedAt(a.getUpdatedAt());
-        
+
         // Populate doctor and service names for better UX
         Optional<Doctor> doctor = doctorRepository.findById(a.getDoctorId());
         if (doctor.isPresent()) {
             res.setDoctorName(doctor.get().getFullName());
             res.setDoctorDepartment(doctor.get().getDepartment());
         }
-        
+
         if (a.getServiceId() != null) {
-            Optional<com.example.appointment_service.model.Service> service = serviceRepository.findById(a.getServiceId());
+            Optional<com.example.appointment_service.model.Service> service = serviceRepository
+                    .findById(a.getServiceId());
             if (service.isPresent()) {
                 res.setServiceName(service.get().getName());
             }
         }
-        
+
         return res;
     }
 }

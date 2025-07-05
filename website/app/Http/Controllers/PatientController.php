@@ -98,4 +98,9 @@ class PatientController extends Controller
             return back()->withErrors('Lỗi: ' . $e->getMessage());
         }
     }
+
+    public function create()
+    {
+        return view('patients.create');
+    }
 }

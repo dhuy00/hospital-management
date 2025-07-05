@@ -20,6 +20,8 @@ Route::get('/patients', [\App\Http\Controllers\PatientController::class, 'index'
 Route::get('/patients/{id}', [\App\Http\Controllers\PatientController::class, 'show'])->name('patients.show');
 Route::get('/patients/{id}/edit', [PatientController::class, 'edit'])->name('patients.edit');
 Route::put('/patients/{id}', [PatientController::class, 'update'])->name('patients.update');
+Route::get('/patients/create', [PatientController::class, 'create'])->name('patients.create');
+Route::post('/patients', [PatientController::class, 'store'])->name('patients.store');
 
 Route::get('/patients/{patientId}/records/{recordId}/prescription', [\App\Http\Controllers\PatientController::class, 'prescriptionDetail'])->name('patients.prescription');
 
