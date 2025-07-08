@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AppointmentController;
 
 Route::get('/patients', [PatientController::class, 'index']);
 Route::get('/patients/{id}', [PatientController::class, 'show']);
+Route::post('/patients', [PatientController::class, 'store']);
 Route::put('/patients/{id}', [PatientController::class, 'update']);
 
 Route::get('/appointments', [AppointmentController::class, 'getAllAppointments']);

@@ -57,6 +57,46 @@ class PatientController extends Controller
     }
   }
 
+  public function store(Request $request)
+  {
+    Log::info('Create patient called with data:', $request->all());
+
+    $request->validate([
+      'email' => 'required|email',
+      'password' => 'required|string|min:6',
+      'fullName' => 'required|string|max:255',
+      'phone' => 'required|string|max:20',
+      'dateOfBirth' => 'required|date',
+      'gender' => 'required|string',
+      'address' => 'required|string',
+    ]);
+
+    try {
+      $response = Http::asJson()->post('http://localhost:8081/api/patients/register', [
+        'email' => $request->email,
+        'password' => $request->password,
+        'fullName' => $request->fullName,
+        'phone' => $request->phone,
+        'dateOfBirth' => $request->dateOfBirth,
+        'gender' => $request->gender,
+        'address' => $request->address,
+      ]);
+
+      Log::info('API Create Patient Response', [
+        'status' => $response->status(),
+        'body' => $response->body(),
+      ]);
+
+      if ($response->successful()) {
+        return response()->json(['message' => 'Patient created successfully', 'data' => $response->json()], 201);
+      }
+
+      return response()->json(['error' => 'Failed to create patient', 'status' => $response->status(), 'body' => $response->body()], 500);
+    } catch (\Exception $e) {
+      return response()->json(['error' => 'Error connecting to patient service', 'message' => $e->getMessage()], 500);
+    }
+  }
+
   public function update(Request $request, $id)
   {
     Log::info('Update called with data:', $request->all());

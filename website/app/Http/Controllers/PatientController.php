@@ -99,6 +99,28 @@ class PatientController extends Controller
         }
     }
 
+    public function store(Request $request)
+    {
+        Log::info('Create patient called with data:', $request->all());
+
+        try {
+            $response = Http::asJson()->post('http://localhost:8001/api/patients', $request->all());
+
+            Log::info('API Gateway Create Patient Response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                return redirect()->route('patients.index')->with('success', 'Tạo bệnh nhân thành công');
+            }
+
+            return back()->withErrors('Tạo bệnh nhân thất bại. API Gateway trả về: ' . $response->body());
+        } catch (\Exception $e) {
+            return back()->withErrors('Lỗi khi kết nối API Gateway: ' . $e->getMessage());
+        }
+    }
+
     public function create()
     {
         return view('patients.create');

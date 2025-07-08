@@ -15,7 +15,7 @@
         <tr>
             <th class="p-3 text-left">ID</th>
             <th class="p-3 text-left">Tên</th>
-            <th class="p-3 text-left">Tuổi</th>
+            <th class="p-3 text-left">Ngày sinh</th>
             <th class="p-3 text-left">Địa chỉ</th>
             <th class="p-3 text-left">Giới tính</th>
             <th class="p-3 text-left">Hành động</th>
