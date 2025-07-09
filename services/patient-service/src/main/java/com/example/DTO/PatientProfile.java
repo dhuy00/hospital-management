@@ -2,8 +2,8 @@ package com.example.DTO;
 
 import java.time.LocalDate;
 
+import com.example.model.BloodType;
 import com.example.model.Gender;
-
 
 public class PatientProfile {
     public String email;
@@ -12,4 +12,14 @@ public class PatientProfile {
     public LocalDate dateOfBirth;
     public Gender gender;
     public String address;
+    
+    // Medical information fields
+    public BloodType bloodType;
+    public String chronicDiseases;
+    public String allergies;
+    public String medications;
+    public String emergencyContactName;
+    public String emergencyContactPhone;
+    public String insuranceNumber;
+    public String occupation;
 }

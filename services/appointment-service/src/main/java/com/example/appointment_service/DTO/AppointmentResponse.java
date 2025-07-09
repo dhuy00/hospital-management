@@ -1,6 +1,7 @@
 package com.example.appointment_service.DTO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.appointment_service.model.AppointmentStatus;
 
@@ -12,7 +13,8 @@ public class AppointmentResponse {
     private Long patientId;
     private Long doctorId;
     private LocalDateTime appointmentTime;
-    private Long serviceId;
+    private List<Long> serviceIds; // Changed to support multiple services
+    private List<String> serviceNames; // Service names for better UX
     private AppointmentStatus status;
     private String reason;
     private LocalDateTime createdAt;
@@ -20,5 +22,4 @@ public class AppointmentResponse {
     
     // Optional: include related entity names for better UX
     private String doctorName;
-    private String serviceName;
 }

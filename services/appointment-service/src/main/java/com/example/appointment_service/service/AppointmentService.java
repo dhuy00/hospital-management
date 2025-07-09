@@ -1,8 +1,10 @@
 package com.example.appointment_service.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +18,20 @@ import com.example.appointment_service.model.Appointment;
 import com.example.appointment_service.model.AppointmentStatus;
 import com.example.appointment_service.model.Doctor;
 import com.example.appointment_service.repository.AppointmentRepository;
+import com.example.appointment_service.repository.AppointmentServiceRepository;
 import com.example.appointment_service.repository.DoctorRepository;
 import com.example.appointment_service.repository.ServiceRepository;
 
+import jakarta.transaction.Transactional;
 
 @Service
 public class AppointmentService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private AppointmentServiceRepository appointmentServiceRepository;
 
     @Autowired
     private DoctorRepository doctorRepository;
@@ -45,6 +52,7 @@ public class AppointmentService {
 		}
 	}
 
+    @Transactional
     public AppointmentResponse book(AppointmentRequest request) {
         // Validate patient exists
         if (!checkPatientExists(request.getPatientId())) {
@@ -56,22 +64,38 @@ public class AppointmentService {
     	    throw new RuntimeException("Doctor not found");
     	}
     	
-    	// Validate service exists (if provided)
-    	if (request.getServiceId() != null && !serviceRepository.existsById(request.getServiceId())) {
-    	    throw new RuntimeException("Service not found");
+    	// Validate all services exist (if provided)
+    	if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
+    	    for (Long serviceId : request.getServiceIds()) {
+    	        if (!serviceRepository.existsById(serviceId)) {
+    	            throw new RuntimeException("Service with ID " + serviceId + " not found");
+    	        }
+    	    }
     	}
 		
+		// Create appointment
 		Appointment a = new Appointment();
         a.setPatientId(request.getPatientId());
         a.setDoctorId(request.getDoctorId());
         a.setAppointmentTime(request.getAppointmentTime());
-        a.setServiceId(request.getServiceId());
         a.setReason(request.getReason());
         a.setStatus(AppointmentStatus.SCHEDULED);
         a.setCreatedAt(LocalDateTime.now());
         a.setUpdatedAt(LocalDateTime.now());
 
         a = appointmentRepository.save(a);
+        
+        // Create appointment-service relationships
+        if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
+            for (Long serviceId : request.getServiceIds()) {
+                com.example.appointment_service.model.AppointmentService appointmentService = 
+                    new com.example.appointment_service.model.AppointmentService();
+                appointmentService.setAppointmentId(a.getId());
+                appointmentService.setServiceId(serviceId);
+                appointmentService.setCreatedAt(LocalDateTime.now());
+                appointmentServiceRepository.save(appointmentService);
+            }
+        }
 
         return toResponse(a);
     }
@@ -87,10 +111,18 @@ public class AppointmentService {
     }
 
     public List<AppointmentResponse> getAppointmentsByService(Long serviceId) {
-        return appointmentRepository.findByServiceId(serviceId)
-                .stream().map(this::toResponse).toList();
+        List<com.example.appointment_service.model.AppointmentService> appointmentServices = 
+            appointmentServiceRepository.findByServiceId(serviceId);
+        
+        return appointmentServices.stream()
+            .map(as -> appointmentRepository.findById(as.getAppointmentId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(this::toResponse)
+            .collect(Collectors.toList());
     }
 
+    @Transactional
     public AppointmentResponse cancel(Long appointmentId) {
         Appointment a = appointmentRepository.findById(appointmentId).orElseThrow();
         a.setStatus(AppointmentStatus.CANCELLED);
@@ -98,6 +130,7 @@ public class AppointmentService {
         return toResponse(appointmentRepository.save(a));
     }
 
+    @Transactional
     public AppointmentResponse complete(Long appointmentId) {
         Appointment a = appointmentRepository.findById(appointmentId).orElseThrow();
         a.setStatus(AppointmentStatus.COMPLETED);
@@ -111,24 +144,36 @@ public class AppointmentService {
         res.setPatientId(a.getPatientId());
         res.setDoctorId(a.getDoctorId());
         res.setAppointmentTime(a.getAppointmentTime());
-        res.setServiceId(a.getServiceId());
         res.setStatus(a.getStatus());
         res.setReason(a.getReason());
         res.setCreatedAt(a.getCreatedAt());
         res.setUpdatedAt(a.getUpdatedAt());
         
-        // Populate doctor and service names for better UX
+        // Populate doctor name
         Optional<Doctor> doctor = doctorRepository.findById(a.getDoctorId());
         if (doctor.isPresent()) {
             res.setDoctorName(doctor.get().getFullName());
         }
         
-        if (a.getServiceId() != null) {
-            Optional<com.example.appointment_service.model.Service> service = serviceRepository.findById(a.getServiceId());
+        // Populate service IDs and names
+        List<com.example.appointment_service.model.AppointmentService> appointmentServices = 
+            appointmentServiceRepository.findByAppointmentId(a.getId());
+        
+        List<Long> serviceIds = new ArrayList<>();
+        List<String> serviceNames = new ArrayList<>();
+        
+        for (com.example.appointment_service.model.AppointmentService as : appointmentServices) {
+            serviceIds.add(as.getServiceId());
+            
+            Optional<com.example.appointment_service.model.Service> service = 
+                serviceRepository.findById(as.getServiceId());
             if (service.isPresent()) {
-                res.setServiceName(service.get().getName());
+                serviceNames.add(service.get().getName());
             }
         }
+        
+        res.setServiceIds(serviceIds);
+        res.setServiceNames(serviceNames);
         
         return res;
     }
