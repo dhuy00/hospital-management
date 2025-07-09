@@ -138,6 +138,55 @@ public class AppointmentService {
         return toResponse(appointmentRepository.save(a));
     }
 
+    @Transactional
+    public AppointmentResponse updateAppointment(Long id, AppointmentRequest request) {
+        Appointment a = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        
+        // Validate doctor exists
+        if (!doctorRepository.existsById(request.getDoctorId())) {
+            throw new RuntimeException("Doctor not found");
+        }
+        
+        // Validate all services exist (if provided)
+        if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
+            for (Long serviceId : request.getServiceIds()) {
+                if (!serviceRepository.existsById(serviceId)) {
+                    throw new RuntimeException("Service with ID " + serviceId + " not found");
+                }
+            }
+        }
+        
+        // Update appointment
+        a.setDoctorId(request.getDoctorId());
+        a.setAppointmentTime(request.getAppointmentTime());
+        a.setReason(request.getReason());
+        a.setUpdatedAt(LocalDateTime.now());
+        
+        a = appointmentRepository.save(a);
+        
+        // Delete existing appointment-service relationships
+        List<com.example.appointment_service.model.AppointmentService> existingServices = 
+            appointmentServiceRepository.findByAppointmentId(id);
+        for (com.example.appointment_service.model.AppointmentService existingService : existingServices) {
+            appointmentServiceRepository.delete(existingService);
+        }
+        
+        // Create new appointment-service relationships
+        if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
+            for (Long serviceId : request.getServiceIds()) {
+                com.example.appointment_service.model.AppointmentService appointmentService = 
+                    new com.example.appointment_service.model.AppointmentService();
+                appointmentService.setAppointmentId(a.getId());
+                appointmentService.setServiceId(serviceId);
+                appointmentService.setCreatedAt(LocalDateTime.now());
+                appointmentServiceRepository.save(appointmentService);
+            }
+        }
+        
+        return toResponse(a);
+    }
+
     private AppointmentResponse toResponse(Appointment a) {
         AppointmentResponse res = new AppointmentResponse();
         res.setId(a.getId());

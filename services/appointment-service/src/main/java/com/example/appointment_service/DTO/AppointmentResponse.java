@@ -22,4 +22,6 @@ public class AppointmentResponse {
     
     // Optional: include related entity names for better UX
     private String doctorName;
+    private String serviceName;
+    private String doctorDepartment;
 }

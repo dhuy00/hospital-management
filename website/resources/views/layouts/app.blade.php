@@ -12,21 +12,61 @@
 <body class="flex min-h-screen bg-gray-100">
 
     {{-- Sidebar --}}
-    <div class="w-64 bg-white shadow-md p-4 space-y-6">
-        <h2 class="text-xl font-bold">Quản lý</h2>
+    <div class="w-64 bg-white shadow-lg p-4 space-y-6">
+        <h2 class="text-2xl font-bold text-blue-600">Quản lý</h2>
 
-        <ul class="space-y-3 text-gray-700">
+        <ul class="space-y-6 font-medium text-gray-700">
             @auth
             @if(auth()->user()->role === 'admin')
-            <li><a href="#">Quản lý người dùng</a></li>
-            <li><a href="#">Thống kê</a></li>
-            <li><a href="#">Cài đặt</a></li>
+            <li>
+                <a href="#" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="users"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="bar-chart-2"></i>
+                    <span>Thống kê</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="settings"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </li>
             @elseif(auth()->user()->role === 'staff')
-            <li><a href="/patients">Bệnh nhân</a></li>
-            <li><a href="/appointments">Lịch hẹn</a></li>
-            <li><a href="/prescriptions">Đơn thuốc</a></li>
-            <li><a href="/notifications">Thông báo</a></li>
-            <li><a href="/reports">Thống kê</a></li>
+            <li>
+                <a href="/patients" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="user"></i>
+                    <span>Bệnh nhân</span>
+                </a>
+            </li>
+            <li>
+                <a href="/appointments" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="calendar"></i>
+                    <span>Lịch hẹn</span>
+                </a>
+            </li>
+            <li>
+                <a href="/prescriptions" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="file-text"></i>
+                    <span>Đơn thuốc</span>
+                </a>
+            </li>
+            <li>
+                <a href="/notifications" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="bell"></i>
+                    <span>Thông báo</span>
+                </a>
+            </li>
+            <li>
+                <a href="/reports" class="flex items-center space-x-2 hover:text-blue-600">
+                    <i data-lucide="bar-chart"></i>
+                    <span>Thống kê</span>
+                </a>
+            </li>
             @else
             <li class="text-gray-400">Không có quyền truy cập</li>
             @endif
@@ -36,9 +76,26 @@
         </ul>
     </div>
 
-    {{-- Nội dung --}}
-    <div class="flex-1 p-6">
-        @yield('content')
+    {{-- Nội dung và Header --}}
+    <div class="flex-1 flex flex-col">
+        {{-- Header --}}
+        <div class="flex items-center justify-between bg-white shadow px-6 py-4">
+            <h1 class="text-xl font-semibold text-gray-800">@yield('title', 'Dashboard')</h1>
+            @auth
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="flex items-center px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                    <i data-lucide="log-out" class="mr-2"></i> Logout
+                </button>
+            </form>
+            @endauth
+        </div>
+
+        {{-- Nội dung --}}
+        <div class="flex-1 p-6">
+            @yield('content')
+        </div>
     </div>
 
     <script>

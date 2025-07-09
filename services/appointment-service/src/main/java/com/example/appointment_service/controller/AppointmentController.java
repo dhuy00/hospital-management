@@ -22,6 +22,16 @@ public class AppointmentController {
     @Autowired
     private AppointmentService service;
 
+    @GetMapping
+    public List<AppointmentResponse> getAllAppointments() {
+        return service.getAllAppointments();
+    }
+
+    @GetMapping("/{id}")
+    public AppointmentResponse getAppointmentById(@PathVariable Long id) {
+        return service.getAppointmentById(id);
+    }
+
     @PostMapping
     public AppointmentResponse book(@RequestBody AppointmentRequest request) {
         return service.book(request);
