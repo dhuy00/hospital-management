@@ -11,7 +11,8 @@ import com.example.appointment_service.model.Appointment;
 import com.example.appointment_service.model.AppointmentStatus;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-    List<Appointment> findAll(List<Long> ids);
+    
+    List<Appointment> findByIdIn(List<Long> ids);
 
     List<Appointment> findByPatientId(Long patientId);
     
