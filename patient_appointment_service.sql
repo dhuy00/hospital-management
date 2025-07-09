@@ -14,6 +14,14 @@ CREATE TABLE patients (
     date_of_birth   DATE,
     gender          ENUM('MALE', 'FEMALE', 'OTHER'),
     address         TEXT,
+    blood_type      ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') DEFAULT 'O+',
+    chronic_diseases TEXT,
+    allergies       TEXT,
+    medications      TEXT,
+    emergency_contact_name VARCHAR(255),
+    emergency_contact_phone VARCHAR(20),
+    insurance_number VARCHAR(50),
+    occupation      VARCHAR(100),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -59,13 +67,21 @@ CREATE TABLE appointments (
     patient_id      BIGINT NOT NULL,
     doctor_id		BIGINT NOT NULL,
     appointment_time DATETIME NOT NULL,
-    service_id		BIGINT,
     status          ENUM('SCHEDULED', 'CANCELLED', 'COMPLETED') DEFAULT 'SCHEDULED',
     reason          TEXT,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id),
-    FOREIGN KEY (service_id) REFERENCES services(id)
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+);
+
+CREATE TABLE appointment_services (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id  BIGINT NOT NULL,
+    service_id      BIGINT NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(id),
+    UNIQUE KEY unique_appointment_service (appointment_id, service_id)
 );
 
 USE patient_db;
@@ -98,8 +114,20 @@ VALUES
 ('Khám nội tiết');
 
 -- Lịch hẹn
-INSERT INTO appointments (patient_id, doctor_id, appointment_time, service_id, status, reason)
+INSERT INTO appointments (patient_id, doctor_id, appointment_time, status, reason)
 VALUES
-(1, 1, '2025-07-10 09:00:00', 1, 'SCHEDULED', 'Khám sức khỏe định kỳ'),
-(2, 2, '2025-07-12 14:30:00', 2, 'SCHEDULED', 'Đau họng liên tục'),
-(3, 1, '2025-07-15 10:00:00', 3, 'CANCELLED', 'Khám nội tiết');
+(1, 1, '2025-07-10 09:00:00', 'SCHEDULED', 'Khám sức khỏe định kỳ'),
+(2, 2, '2025-07-12 14:30:00', 'SCHEDULED', 'Đau họng liên tục'),
+(3, 1, '2025-07-15 10:00:00', 'CANCELLED', 'Khám nội tiết');
+
+-- Gán dịch vụ cho các cuộc hẹn
+INSERT INTO appointment_services (appointment_id, service_id)
+VALUES
+-- Cuộc hẹn 1: Khám tổng quát
+(1, 1),
+-- Cuộc hẹn 2: Khám tai mũi họng
+(2, 2),
+-- Cuộc hẹn 3: Khám nội tiết
+(3, 3),
+-- Ví dụ: Cuộc hẹn 1 có thêm dịch vụ khám tai mũi họng
+(1, 2);

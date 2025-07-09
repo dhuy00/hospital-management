@@ -12,11 +12,11 @@ import com.example.appointment_service.model.AppointmentStatus;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     
+    List<Appointment> findByIdIn(List<Long> ids);
+
     List<Appointment> findByPatientId(Long patientId);
     
     List<Appointment> findByDoctorId(Long doctorId);
-    
-    List<Appointment> findByServiceId(Long serviceId);
     
     List<Appointment> findByStatus(AppointmentStatus status);
     

@@ -37,6 +37,17 @@ public class PatientService {
         p.setDateOfBirth(request.dateOfBirth);
         p.setGender(request.gender);
         p.setAddress(request.address);
+        
+        // Set medical information fields (optional during registration)
+        p.setBloodType(request.bloodType);
+        p.setChronicDiseases(request.chronicDiseases);
+        p.setAllergies(request.allergies);
+        p.setMedications(request.medications);
+        p.setEmergencyContactName(request.emergencyContactName);
+        p.setEmergencyContactPhone(request.emergencyContactPhone);
+        p.setInsuranceNumber(request.insuranceNumber);
+        p.setOccupation(request.occupation);
+        
         p.setCreatedAt(LocalDateTime.now());
         p.setUpdatedAt(LocalDateTime.now());
         return patientRepository.save(p);
@@ -66,6 +77,17 @@ public class PatientService {
         p.setGender(profile.gender);
         p.setDateOfBirth(profile.dateOfBirth);
         p.setAddress(profile.address);
+        
+        // Update medical information fields
+        p.setBloodType(profile.bloodType);
+        p.setChronicDiseases(profile.chronicDiseases);
+        p.setAllergies(profile.allergies);
+        p.setMedications(profile.medications);
+        p.setEmergencyContactName(profile.emergencyContactName);
+        p.setEmergencyContactPhone(profile.emergencyContactPhone);
+        p.setInsuranceNumber(profile.insuranceNumber);
+        p.setOccupation(profile.occupation);
+        
         p.setUpdatedAt(LocalDateTime.now());
         return patientRepository.save(p);
     }

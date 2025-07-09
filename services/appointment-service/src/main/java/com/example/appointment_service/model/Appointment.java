@@ -1,6 +1,7 @@
 package com.example.appointment_service.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,9 +38,6 @@ public class Appointment {
     @Column(name = "appointment_time", nullable = false)
     private LocalDateTime appointmentTime;
 
-    @Column(name = "service_id")
-    private Long serviceId;
-
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
@@ -50,12 +49,11 @@ public class Appointment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Optional: JPA relationships for easier querying
+    // JPA relationships
     @ManyToOne
     @JoinColumn(name = "doctor_id", insertable = false, updatable = false)
     private Doctor doctor;
 
-    @ManyToOne
-    @JoinColumn(name = "service_id", insertable = false, updatable = false)
-    private Service service;
+    @OneToMany(mappedBy = "appointment")
+    private List<AppointmentService> appointmentServices;
 }
