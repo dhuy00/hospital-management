@@ -12,8 +12,8 @@
 <body class="flex min-h-screen bg-gray-100">
 
     {{-- Sidebar --}}
-    <div class="w-64 bg-white shadow-lg p-4 space-y-6">
-        <h2 class="text-2xl font-bold text-blue-600">Quản lý</h2>
+    <div class="w-64 bg-white shadow-lg p-4 space-y-8">
+        <h2 class="text-xl font-bold text-blue-800">Aurora Care </h2>
 
         <ul class="space-y-6 font-medium text-gray-700">
             @auth
