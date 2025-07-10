@@ -187,6 +187,16 @@ public class AppointmentService {
         return toResponse(a);
     }
 
+    public AppointmentResponse getAppointmentById(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        return toResponse(appointment);
+    }
+
+    public List<AppointmentResponse> getAllAppointments() {
+        return appointmentRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
     private AppointmentResponse toResponse(Appointment a) {
         AppointmentResponse res = new AppointmentResponse();
         res.setId(a.getId());
