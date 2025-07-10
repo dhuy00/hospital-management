@@ -48,7 +48,7 @@ public class Patient {
     
     // New medical information fields
     @Column(name = "blood_type")
-    @Enumerated(EnumType.STRING)
+    // No @Enumerated needed as we're using the BloodTypeConverter
     private BloodType bloodType;
     
     @Column(name = "chronic_diseases", columnDefinition = "TEXT")

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class}, scanBasePackages = "com.example")
 @EnableJpaRepositories(basePackages = "com.example.repository")
-@EntityScan(basePackages = "com.example.model")
+@EntityScan(basePackages = {"com.example.model", "com.example.converter"})
 public class PatientServiceApplication {
 
 	public static void main(String[] args) {
