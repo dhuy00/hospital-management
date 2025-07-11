@@ -4,13 +4,13 @@ import com.example.appointment_service.model.Staff;
 
 public class StaffLoginResponse {
     private String token;
-    private Staff staff;
+    private Staff user;
     
     public StaffLoginResponse() {}
     
-    public StaffLoginResponse(String token, Staff staff) {
+    public StaffLoginResponse(String token, Staff user) {
         this.token = token;
-        this.staff = staff;
+        this.user = user;
     }
     
     public String getToken() {
@@ -21,11 +21,11 @@ public class StaffLoginResponse {
         this.token = token;
     }
     
-    public Staff getStaff() {
-        return staff;
+    public Staff getUser() {
+        return user;
     }
     
-    public void setStaff(Staff staff) {
-        this.staff = staff;
+    public void setUser(Staff user) {
+        this.user = user;
     }
 }

@@ -208,10 +208,11 @@ public class AppointmentService {
         res.setCreatedAt(a.getCreatedAt());
         res.setUpdatedAt(a.getUpdatedAt());
         
-        // Populate doctor name
+        // Populate doctor name and department
         Optional<Doctor> doctor = doctorRepository.findById(a.getDoctorId());
         if (doctor.isPresent()) {
             res.setDoctorName(doctor.get().getFullName());
+            res.setDoctorDepartment(doctor.get().getDepartment());
         }
         
         // Populate service IDs and names
@@ -220,6 +221,7 @@ public class AppointmentService {
         
         List<Long> serviceIds = new ArrayList<>();
         List<String> serviceNames = new ArrayList<>();
+        StringBuilder allServiceNames = new StringBuilder();
         
         for (com.example.appointment_service.model.AppointmentService as : appointmentServices) {
             serviceIds.add(as.getServiceId());
@@ -227,12 +229,20 @@ public class AppointmentService {
             Optional<com.example.appointment_service.model.Service> service = 
                 serviceRepository.findById(as.getServiceId());
             if (service.isPresent()) {
-                serviceNames.add(service.get().getName());
+                String serviceName = service.get().getName();
+                serviceNames.add(serviceName);
+                
+                // Build comma-separated service names for the serviceName field
+                if (allServiceNames.length() > 0) {
+                    allServiceNames.append(", ");
+                }
+                allServiceNames.append(serviceName);
             }
         }
         
         res.setServiceIds(serviceIds);
         res.setServiceNames(serviceNames);
+        res.setServiceName(allServiceNames.toString()); // Set the single serviceName field
         
         return res;
     }
