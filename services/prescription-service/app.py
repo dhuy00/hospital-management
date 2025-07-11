@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify
 import psycopg2
 
 app = Flask(__name__)
@@ -18,9 +18,9 @@ def add_prescription():
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO prescriptions (patient_id, status)
+        INSERT INTO prescriptions (appointment_id, status)
         VALUES (%s, %s) RETURNING id
-    """, (data['patient_id'], data.get('status', 'chưa lấy')))
+    """, (data['appointment_id'], data.get('status', 'chưa lấy')))
     prescription_id = cur.fetchone()[0]
 
     for med in data['medicines']:
@@ -39,7 +39,7 @@ def get_all_prescriptions():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT p.id, p.patient_id, p.status, p.created_at,
+        SELECT p.id, p.appointment_id, p.status, p.created_at,
                d.medicine_name, d.dosage, d.instructions
         FROM prescriptions p
         JOIN prescription_details d ON p.id = d.prescription_id
@@ -54,7 +54,7 @@ def get_all_prescriptions():
         if pid not in prescriptions:
             prescriptions[pid] = {
                 "prescription_id": pid,
-                "patient_id": row[1],
+                "appointment_id": row[1],
                 "status": row[2],
                 "created_at": row[3],
                 "medicines": []
@@ -73,9 +73,9 @@ def get_prescription_by_id(id):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT p.id, p.patient_id, pa.name, p.status, p.created_at
+        SELECT p.id, p.appointment_id, a.patient_id, p.status, p.created_at
         FROM prescriptions p
-        JOIN patients pa ON p.patient_id = pa.id
+        JOIN appointments a ON p.appointment_id = a.id
         WHERE p.id = %s
     """, (id,))
     prescription_row = cur.fetchone()
@@ -93,8 +93,8 @@ def get_prescription_by_id(id):
 
     result = {
         "prescription_id": prescription_row[0],
-        "patient_id": prescription_row[1],
-        "patient_name": prescription_row[2],
+        "appointment_id": prescription_row[1],
+        "patient_id": prescription_row[2],
         "status": prescription_row[3],
         "created_at": prescription_row[4],
         "medicines": [
@@ -109,24 +109,24 @@ def get_prescription_by_id(id):
 
     return jsonify(result)
 
-@app.route("/api/prescriptions/patient/<int:patient_id>", methods=["GET"])
-def get_prescriptions_by_patient_id(patient_id):
+
+@app.route("/api/prescriptions/appointment/<int:appointment_id>", methods=["GET"])
+def get_prescriptions_by_appointment_id(appointment_id):
     cur = conn.cursor()
 
-    # Lấy tất cả đơn thuốc của bệnh nhân
     cur.execute("""
-        SELECT p.id, p.patient_id, p.status, p.created_at,
+        SELECT p.id, p.appointment_id, p.status, p.created_at,
                d.medicine_name, d.dosage, d.instructions
         FROM prescriptions p
         LEFT JOIN prescription_details d ON p.id = d.prescription_id
-        WHERE p.patient_id = %s
+        WHERE p.appointment_id = %s
         ORDER BY p.id
-    """, (patient_id,))
+    """, (appointment_id,))
     rows = cur.fetchall()
     cur.close()
 
     if not rows:
-        return jsonify({"error": "No prescriptions found for this patient"}), 404
+        return jsonify({"error": "No prescriptions found for this appointment"}), 404
 
     prescriptions = {}
     for row in rows:
@@ -134,12 +134,12 @@ def get_prescriptions_by_patient_id(patient_id):
         if pid not in prescriptions:
             prescriptions[pid] = {
                 "prescription_id": pid,
-                "patient_id": row[1],
+                "appointment_id": row[1],
                 "status": row[2],
                 "created_at": row[3],
                 "medicines": []
             }
-        if row[4]:
+        if row[4]:  # Nếu có thuốc
             prescriptions[pid]["medicines"].append({
                 "medicine_name": row[4],
                 "dosage": row[5],
@@ -156,10 +156,10 @@ def update_prescription(id):
 
     cur.execute("""
         UPDATE prescriptions
-        SET patient_id = %s,
+        SET appointment_id = %s,
             status = %s
         WHERE id = %s
-    """, (data['patient_id'], data['status'], id))
+    """, (data['appointment_id'], data['status'], id))
 
     cur.execute("""
         DELETE FROM prescription_details
@@ -186,4 +186,4 @@ def delete_prescription(id):
     return jsonify({"message": "Prescription deleted."})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5000, debug=True)

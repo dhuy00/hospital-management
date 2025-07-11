@@ -15,9 +15,24 @@
             <label>Mật khẩu</label>
             <input type="password" name="password" class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
         </div>
+
+        <div class="mb-4 flex flex-col gap-2">
+            <label>Đăng nhập với tư cách</label>
+            <select name="role" class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                <option value="patient">Bệnh nhân</option>
+                <option value="doctor">Bác sĩ</option>
+                <option value="staff">Nhân viên</option>
+            </select>
+        </div>
+
         <button type="submit" class="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">
             Đăng nhập
         </button>
+
+        <div class="text-center mt-2">
+            Bạn là bệnh nhân chưa có tài khoản? <a href="{{ route('register') }}" class="text-blue-500 hover:underline">Đăng ký ngay</a>
+        </div>
+
     </form>
 </div>
 @endsection

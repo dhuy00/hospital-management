@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -15,44 +16,49 @@ class AuthController extends Controller
     return view('auth.register');
   }
 
-  public function register(Request $request)
-  {
-    // Validate dữ liệu nhập vào
-    $validator = Validator::make($request->all(), [
-      'name' => 'required|string|max:255',
-      'email' => 'required|email|unique:users,email',
-      'password' => 'required|min:6|confirmed', // xác nhận với field password_confirmation
-    ]);
-
-    if ($validator->fails()) {
-      return back()->withErrors($validator)->withInput();
-    }
-
-    // Tạo user mới
-    User::create([
-      'name' => $request->name,
-      'email' => $request->email,
-      'password' => Hash::make($request->password),
-      'role' => 'staff', 
-    ]);
-
-
-    return redirect()->route('login')->with('success', 'Đăng ký thành công!');
-  }
-
   public function login(Request $request)
   {
-    $credentials = $request->only('email', 'password');
+    $request->validate([
+      'email' => 'required|email',
+      'password' => 'required',
+      'role' => 'required|in:patient,doctor,staff',
+    ]);
 
-    if (Auth::attempt($credentials)) {
-      // Đăng nhập thành công
-      return redirect()->route('home');
+    $role = $request->input('role');
+    $email = $request->input('email');
+    $password = $request->input('password');
+
+    // Chọn API endpoint theo role
+    $apiUrls = [
+      'patient' => 'http://api-gateway.local/api/patient/login',
+      'doctor' => 'http://api-gateway.local/api/doctor/login',
+      'staff' => 'http://api-gateway.local/api/staff/login',
+    ];
+
+    $url = $apiUrls[$role];
+
+    try {
+      $response = Http::post($url, [
+        'email' => $email,
+        'password' => $password,
+      ]);
+
+      if ($response->successful()) {
+        $data = $response->json();
+
+        session(['access_token' => $data['access_token'], 'user' => $data['user']]);
+
+        return redirect()->route('home');
+      } else {
+        return back()->withErrors([
+          'email' => 'Sai email hoặc mật khẩu hoặc vai trò không hợp lệ',
+        ])->withInput();
+      }
+    } catch (\Exception $e) {
+      return back()->withErrors([
+        'email' => 'Lỗi kết nối tới máy chủ: ' . $e->getMessage(),
+      ])->withInput();
     }
-
-    // Đăng nhập thất bại
-    return back()->withErrors([
-      'email' => 'Sai email hoặc mật khẩu',
-    ])->withInput();
   }
 
   public function logout()
