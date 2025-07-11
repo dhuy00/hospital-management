@@ -4,13 +4,13 @@ import com.example.appointment_service.model.Doctor;
 
 public class DoctorLoginResponse {
     private String token;
-    private Doctor doctor;
+    private Doctor user;
     
     public DoctorLoginResponse() {}
     
-    public DoctorLoginResponse(String token, Doctor doctor) {
+    public DoctorLoginResponse(String token, Doctor user) {
         this.token = token;
-        this.doctor = doctor;
+        this.user = user;
     }
     
     public String getToken() {
@@ -21,11 +21,11 @@ public class DoctorLoginResponse {
         this.token = token;
     }
     
-    public Doctor getDoctor() {
-        return doctor;
+    public Doctor getUser() {
+        return user;
     }
     
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+    public void setUser(Doctor user) {
+        this.user = user;
     }
 }
