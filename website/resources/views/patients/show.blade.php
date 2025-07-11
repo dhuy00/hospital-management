@@ -19,13 +19,13 @@
         <p><strong>Ngày sinh:</strong> {{ $patient['dateOfBirth'] }}</p>
         <p><strong>Số điện thoại:</strong> {{ $patient['phone'] }}</p>
         <p><strong>Giới tính:</strong> {{ $patient['gender'] }}</p>
-        <p><strong>Nhóm máu:</strong> {{ $patient['blood_type'] ?? 'Chưa cập nhật' }}</p>
-        <p><strong>Bệnh mãn tính:</strong> {{ $patient['chronic_diseases'] ?? 'Không có' }}</p>
+        <p><strong>Nhóm máu:</strong> {{ $patient['bloodType'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Bệnh mãn tính:</strong> {{ $patient['chronicDiseases'] ?? 'Không có' }}</p>
         <p><strong>Dị ứng:</strong> {{ $patient['allergies'] ?? 'Không có' }}</p>
         <p><strong>Thuốc đang dùng:</strong> {{ $patient['medications'] ?? 'Không có' }}</p>
-        <p><strong>Người liên hệ khẩn cấp:</strong> {{ $patient['emergency_contact_name'] ?? 'Chưa cập nhật' }}</p>
-        <p><strong>Điện thoại khẩn cấp:</strong> {{ $patient['emergency_contact_phone'] ?? 'Chưa cập nhật' }}</p>
-        <p><strong>Số bảo hiểm:</strong> {{ $patient['insurance_number'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Người liên hệ khẩn cấp:</strong> {{ $patient['emergencyContactName'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Điện thoại khẩn cấp:</strong> {{ $patient['emergencyContactPhone'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Số bảo hiểm:</strong> {{ $patient['insuranceNumber'] ?? 'Chưa cập nhật' }}</p>
         <p><strong>Nghề nghiệp:</strong> {{ $patient['occupation'] ?? 'Chưa cập nhật' }}</p>
         <p class="md:col-span-2"><strong>Địa chỉ:</strong> {{ $patient['address'] }}</p>
     </div>
@@ -40,10 +40,13 @@
             <p><strong>Ngày khám:</strong> {{ $record['appointmentTime'] }}</p>
             <p><strong>Bác sĩ:</strong> {{ $record['doctorName'] }}</p>
             <p><strong>Lý do:</strong> {{ $record['reason'] }}</p>
-            <p><strong>Khoa:</strong> {{ $record['doctorDepartment'] }}</p>
-            <p class="md:col-span-2"><strong>Dịch vụ sử dụng:</strong> {{ $record['serviceName'] }}</p>
+            <p><strong>Khoa:</strong> {{ $record['doctorDepartment'] ?? 'Không rõ' }}</p>
+            <p class="md:col-span-2"><strong>Dịch vụ sử dụng:</strong>
+                {{ !empty($record['serviceNames']) ? implode(', ', $record['serviceNames']) : 'Không có' }}
+            </p>
         </div>
-        <a href="{{ route('patients.prescription', ['patientId' => $patient['id'], 'recordId' => $loop->iteration]) }}"
+
+        <a href="{{ route('patients.prescription', ['patientId' => $patient['id'], 'recordId' => $record['id']]) }}"
             class="inline-flex items-center bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
             <i data-lucide="file-text" class="mr-2 w-4 h-4"></i> Xem đơn thuốc
         </a>

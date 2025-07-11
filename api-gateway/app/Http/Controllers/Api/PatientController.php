@@ -154,7 +154,6 @@ class PatientController extends Controller
     ]);
 
     try {
-      // Gọi API update
       $response = Http::asJson()->put("http://localhost:8081/api/patients/{$id}", [
         'fullName' => $request->fullName,
         'email' => $request->email,
