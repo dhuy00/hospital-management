@@ -1,5 +1,8 @@
 from flask import Flask, request, jsonify
 import psycopg2
+from threading import Thread
+from rabbitmq_consumer import start_listening
+
 
 app = Flask(__name__)
 
@@ -116,4 +119,9 @@ def get_patients_per_month():
     return jsonify(response)
 
 if __name__ == "__main__":
+    # Chạy RabbitMQ consumer song song với Flask
+    t = Thread(target=start_listening)
+    t.daemon = True
+    t.start()
+
     app.run(port=5001, debug=True)

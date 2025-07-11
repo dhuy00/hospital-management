@@ -1,4 +1,5 @@
 package com.example.appointment_service.service;
+import com.example.appointment_service.DTO.AppointmentMessage;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,6 +43,10 @@ public class AppointmentService {
 	@Autowired
 	private RestTemplate restTemplate;
 
+    @Autowired
+private AppointmentProducer appointmentProducer;// tao rabbitMQ
+
+
 	public boolean checkPatientExists(Long patientId) {
 		try {
 			ResponseEntity<Void> response = restTemplate.getForEntity(
@@ -84,6 +89,14 @@ public class AppointmentService {
         a.setUpdatedAt(LocalDateTime.now());
 
         a = appointmentRepository.save(a);
+       //Create RabbitMQ
+        AppointmentMessage message = new AppointmentMessage(
+          a.getPatientId(),
+          a.getAppointmentTime().toString(),
+          "Nhắc lịch khám"
+            );
+appointmentProducer.send(message);
+
         
         // Create appointment-service relationships
         if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {

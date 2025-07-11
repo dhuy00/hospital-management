@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, make_response
 import psycopg2
+from rabbitmq_sender import send_prescription_message
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -31,6 +32,15 @@ def add_prescription():
 
     conn.commit()
     cur.close()
+    # Chuẩn bị dữ liệu gửi RabbitMQ
+    message = {
+     "patient_id": data['patient_id'],
+      "prescription_id": prescription_id,
+      "status": data.get('status', 'chưa lấy'),
+     "message": "Đơn thuốc mới đã được tạo"
+    }
+    send_prescription_message(message)
+
     return jsonify({"message": "Prescription created", "prescription_id": prescription_id})
 
 
