@@ -19,6 +19,14 @@
         <p><strong>Ngày sinh:</strong> {{ $patient['dateOfBirth'] }}</p>
         <p><strong>Số điện thoại:</strong> {{ $patient['phone'] }}</p>
         <p><strong>Giới tính:</strong> {{ $patient['gender'] }}</p>
+        <p><strong>Nhóm máu:</strong> {{ $patient['blood_type'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Bệnh mãn tính:</strong> {{ $patient['chronic_diseases'] ?? 'Không có' }}</p>
+        <p><strong>Dị ứng:</strong> {{ $patient['allergies'] ?? 'Không có' }}</p>
+        <p><strong>Thuốc đang dùng:</strong> {{ $patient['medications'] ?? 'Không có' }}</p>
+        <p><strong>Người liên hệ khẩn cấp:</strong> {{ $patient['emergency_contact_name'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Điện thoại khẩn cấp:</strong> {{ $patient['emergency_contact_phone'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Số bảo hiểm:</strong> {{ $patient['insurance_number'] ?? 'Chưa cập nhật' }}</p>
+        <p><strong>Nghề nghiệp:</strong> {{ $patient['occupation'] ?? 'Chưa cập nhật' }}</p>
         <p class="md:col-span-2"><strong>Địa chỉ:</strong> {{ $patient['address'] }}</p>
     </div>
 </div>

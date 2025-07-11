@@ -45,13 +45,84 @@
 
   <div>
     <label class="block font-medium mb-1">Giới tính</label>
-    <select name="gender"
-      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+    <select name="gender" class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
       <option value="MALE" {{ old('gender', $patient['gender']) == 'MALE' ? 'selected' : '' }}>MALE</option>
       <option value="FEMALE" {{ old('gender', $patient['gender']) == 'FEMALE' ? 'selected' : '' }}>FEMALE</option>
       <option value="OTHER" {{ old('gender', $patient['gender']) == 'OTHER' ? 'selected' : '' }}>OTHER</option>
     </select>
     @error('gender')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Nhóm máu</label>
+    <input type="text" name="bloodType" value="{{ old('bloodType', $patient['bloodType']) }}"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+    @error('bloodType')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Bệnh mãn tính</label>
+    <textarea name="chronicDiseases" rows="2"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">{{ old('chronicDiseases', $patient['chronicDiseases']) }}</textarea>
+    @error('chronicDiseases')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Dị ứng</label>
+    <textarea name="allergies" rows="2"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">{{ old('allergies', $patient['allergies']) }}</textarea>
+    @error('allergies')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Thuốc đang dùng</label>
+    <textarea name="medications" rows="2"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">{{ old('medications', $patient['medications']) }}</textarea>
+    @error('medications')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Người liên hệ khẩn cấp</label>
+    <input type="text" name="emergencyContactName" value="{{ old('emergencyContactName', $patient['emergencyContactName']) }}"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+    @error('emergencyContactName')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Điện thoại khẩn cấp</label>
+    <input type="text" name="emergencyContactPhone" value="{{ old('emergencyContactPhone', $patient['emergencyContactPhone']) }}"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+    @error('emergencyContactPhone')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Số bảo hiểm</label>
+    <input type="text" name="insuranceNumber" value="{{ old('insuranceNumber', $patient['insuranceNumber']) }}"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+    @error('insuranceNumber')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div>
+    <label class="block font-medium mb-1">Nghề nghiệp</label>
+    <input type="text" name="occupation" value="{{ old('occupation', $patient['occupation']) }}"
+      class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+    @error('occupation')
     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
     @enderror
   </div>

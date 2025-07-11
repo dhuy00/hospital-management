@@ -30,7 +30,7 @@
         </button>
 
         <div class="text-center mt-2">
-            Bạn là bệnh nhân chưa có tài khoản? <a href="{{ route('register') }}" class="text-blue-500 hover:underline">Đăng ký ngay</a>
+            Bạn là bệnh nhân chưa có tài khoản? <a href="{{ route('patients.create') }}" class="text-blue-500 hover:underline">Đăng ký ngay</a>
         </div>
 
     </form>

@@ -4,7 +4,15 @@
 
 @section('content')
 <div class="p-6 bg-green-100 rounded shadow-md">
-    <h2 class="text-xl font-bold mb-4">Chào mừng, {{ auth()->user()->name }}!</h2>
+    @if(session()->has('user'))
+        <h2 class="text-xl font-bold mb-4">
+            Chào mừng, {{ session('user')['name'] ?? 'Người dùng' }}!
+        </h2>
+    @else
+        <h2 class="text-xl font-bold mb-4">
+            Chào mừng!
+        </h2>
+    @endif
 
     <form method="POST" action="{{ route('logout') }}">
         @csrf

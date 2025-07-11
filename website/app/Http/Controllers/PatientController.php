@@ -46,6 +46,7 @@ class PatientController extends Controller
     {
         Log::info('Update called with data:', $request->all());
 
+        // Validate đầy đủ tất cả các trường
         $request->validate([
             'fullName' => 'required|string|max:255',
             'email' => 'required|email',
@@ -53,8 +54,17 @@ class PatientController extends Controller
             'phone' => 'required|string|max:20',
             'gender' => 'required|string',
             'address' => 'required|string',
+            'bloodType' => 'nullable|string|max:10',
+            'chronicDiseases' => 'nullable|string',
+            'allergies' => 'nullable|string',
+            'medications' => 'nullable|string',
+            'emergencyContactName' => 'nullable|string|max:255',
+            'emergencyContactPhone' => 'nullable|string|max:20',
+            'insuranceNumber' => 'nullable|string|max:50',
+            'occupation' => 'nullable|string|max:100',
         ]);
 
+        // Gọi API update
         $response = Http::asJson()->put("http://localhost:8001/api/patients/{$id}", [
             'fullName' => $request->fullName,
             'email' => $request->email,
@@ -62,15 +72,28 @@ class PatientController extends Controller
             'phone' => $request->phone,
             'gender' => $request->gender,
             'address' => $request->address,
+            'bloodType' => $request->bloodType,
+            'chronicDiseases' => $request->chronicDiseases,
+            'allergies' => $request->allergies,
+            'medications' => $request->medications,
+            'emergencyContactName' => $request->emergencyContactName,
+            'emergencyContactPhone' => $request->emergencyContactPhone,
+            'insuranceNumber' => $request->insuranceNumber,
+            'occupation' => $request->occupation,
         ]);
 
         Log::info('API Response', [
             'status' => $response->status(),
+            'body' => $response->body(),
         ]);
 
+        if (!$response->successful()) {
+            return back()->withErrors(['error' => 'Lỗi khi cập nhật bệnh nhân.'])->withInput();
+        }
 
         return redirect()->route('patients.show', $id)->with('success', 'Cập nhật thành công');
     }
+
 
     public function prescriptionDetail($patientId, $recordId)
     {
