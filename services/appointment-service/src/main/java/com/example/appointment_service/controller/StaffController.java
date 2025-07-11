@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.appointment_service.DTO.LoginRequest;
+import com.example.appointment_service.DTO.StaffLoginResponse;
 import com.example.appointment_service.model.Staff;
 import com.example.appointment_service.repository.StaffRepository;
 import com.example.appointment_service.service.AuthService;
@@ -32,8 +33,8 @@ public class StaffController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            String token = authService.authenticateStaff(request);
-            return ResponseEntity.ok(token);
+            StaffLoginResponse response = authService.authenticateStaff(request);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
