@@ -16,56 +16,50 @@ class AuthController extends Controller
     return view('auth.register');
   }
 
-  public function login(Request $request)
-  {
+public function login(Request $request)
+{
     $request->validate([
-      'email' => 'required|email',
-      'password' => 'required',
-      'role' => 'required|in:patient,doctor,staff',
+        'email' => 'required|email',
+        'password' => 'required',
+        'role' => 'required|in:patient,doctor,staff',
     ]);
 
-    $role = $request->input('role');
-    $email = $request->input('email');
-    $password = $request->input('password');
-
-    // Chọn API endpoint theo role
-    $apiUrls = [
-      'patient' => 'http://api-gateway.local/api/patient/login',
-      'doctor' => 'http://api-gateway.local/api/doctor/login',
-      'staff' => 'http://api-gateway.local/api/staff/login',
-    ];
-
-    $url = $apiUrls[$role];
-
     try {
-      $response = Http::post($url, [
-        'email' => $email,
-        'password' => $password,
-      ]);
+        $response = Http::asJson()->post('http://api-gateway.local/api/login', [
+            'email' => $request->email,
+            'password' => $request->password,
+            'role' => $request->role,
+        ]);
 
-      if ($response->successful()) {
-        $data = $response->json();
+        if ($response->successful()) {
+            $data = $response->json();
 
-        session(['access_token' => $data['access_token'], 'user' => $data['user']]);
+            session([
+                'access_token' => $data['data']['access_token'],
+                'user' => $data['data']['user'],
+                'role' => $request->role,
+            ]);
 
-        return redirect()->route('home');
-      } else {
+            return redirect()->route('home');
+        }
+
         return back()->withErrors([
-          'email' => 'Sai email hoặc mật khẩu hoặc vai trò không hợp lệ',
+            'email' => $response->json('error') ?? 'Đăng nhập thất bại',
         ])->withInput();
-      }
-    } catch (\Exception $e) {
-      return back()->withErrors([
-        'email' => 'Lỗi kết nối tới máy chủ: ' . $e->getMessage(),
-      ])->withInput();
-    }
-  }
 
-  public function logout()
-  {
-    Auth::logout();
+    } catch (\Exception $e) {
+        return back()->withErrors([
+            'email' => 'Lỗi kết nối tới máy chủ: ' . $e->getMessage(),
+        ])->withInput();
+    }
+}
+
+
+public function logout()
+{
+    session()->flush(); 
     return redirect()->route('login');
-  }
+}
 
   public function showLoginForm()
   {
